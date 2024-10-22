@@ -10,7 +10,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            String path = "/fxml/EmployeesView.fxml";
+            String path = "src/main/resources/se/lu/ics/fxml/StudentView.fxml"; //TODO: this seems to not be the correct path.. crashes on line 17
 
             // Load root layout from fxml file (on the classpath).
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
@@ -21,7 +21,7 @@ public class Main extends Application {
             primaryStage.setScene(scene);
 
             // Set the stage title and show it
-            primaryStage.setTitle("Employees");
+            primaryStage.setTitle("Students");
             primaryStage.show();
 
         } catch (Exception e) {
