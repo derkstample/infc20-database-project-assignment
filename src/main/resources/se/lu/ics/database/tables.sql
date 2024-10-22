@@ -1,31 +1,31 @@
-CREATE TABLE Course
-(
-    CourseID 	INT IDENTITY(1,1), -- Surrogate key
-    CourseCode VARCHAR(5) NOT NULL, -- Natural key with NOT NULL
-    CourseName VARCHAR(100),
-    Credits INT,
-    CONSTRAINT PK_Course_CourseID PRIMARY KEY(CourseID),
-    CONSTRAINT UQ_Course_CourseCode UNIQUE(CourseCode) -- Unique constraint for natural key
+CREATE TABLE Customer (
+  CustomerID 		INTEGER IDENTITY(1,1),
+  AccountNo     	VARCHAR(10) NOT NULL, 
+  CustomerName   	VARCHAR(20),
+  DeliveryAddress 	VARCHAR(20),
+
+  CONSTRAINT PK_Customer_CustomerID PRIMARY KEY(CustomerID),
+  CONSTRAINT UQ_Customer_AccountNo UNIQUE(AccountNo)
 );
 
-CREATE TABLE Student
-(
-    StudentID INT IDENTITY(1,1), -- Surrogate key
-    PersonalNo VARCHAR(5) NOT NULL, -- Natural key with NOT NULL
-    StudentName VARCHAR(100),
-    StudentEmail VARCHAR(100),
-    CONSTRAINT PK_Student_StudentID PRIMARY KEY(StudentID),
-    CONSTRAINT UQ_Student_StudentNo UNIQUE(StudentNo) -- Unique constraint for natural key
+CREATE TABLE FruitBasket (
+  BasketID    	INTEGER IDENTITY(1,1),
+  BasketNo  	VARCHAR(10) NOT NULL,
+  BasketName  	VARCHAR(30),
+  Price     	DECIMAL(5,2),
+
+  CONSTRAINT PK_FruitBasket_BasketID PRIMARY KEY(BasketID),
+  CONSTRAINT UQ_FruitBasket_BasketNo UNIQUE(BasketNo),
 );
 
-CREATE TABLE HasStudied
-(
-    StudentID INT, 
-    CourseID INT,
-    Grade INT,
-    CONSTRAINT PK_HasStudied_StudentID_CourseID PRIMARY KEY(StudentID, CourseID),
-    CONSTRAINT FK_HasStudied_Student_StudentID FOREIGN KEY(StudentID) 
-    REFERENCES Student(StudentID),
-    CONSTRAINT FK_HasStudied_Course_CourseID FOREIGN KEY(CourseID) 
-    REFERENCES Course(CourseID)
+CREATE TABLE Purchase (
+  CustomerID 	INTEGER,
+  BasketID  	INTEGER,
+  PurchaseDate	DATE,
+
+  CONSTRAINT PK_Purchase_CustomerID_BasketID PRIMARY KEY(CustomerID, BasketID),
+  CONSTRAINT FK_Purchase_Customer_CustomerID FOREIGN KEY(CustomerID)
+  	REFERENCES Customer(CustomerID) ON DELETE CASCADE,
+  CONSTRAINT FK_Purchase_FruitBasket_BasketID FOREIGN KEY(BasketID)
+  	REFERENCES FruitBasket(BasketID) ON DELETE CASCADE
 );
