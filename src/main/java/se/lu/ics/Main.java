@@ -10,18 +10,18 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            String path = "src/main/resources/se/lu/ics/fxml/StudentView.fxml"; //TODO: this seems to not be the correct path.. crashes on line 17
+            String path = "/se/lu/ics/fxml/CustomerView.fxml";
 
             // Load root layout from fxml file (on the classpath).
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
-            AnchorPane root = loader.load();
+            AnchorPane root = loader.load(); //this is where CustomerViewController actually gets called
 
             // Create a scene and set it on the stage
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
 
             // Set the stage title and show it
-            primaryStage.setTitle("Students");
+            primaryStage.setTitle("Customers");
             primaryStage.show();
 
         } catch (Exception e) {

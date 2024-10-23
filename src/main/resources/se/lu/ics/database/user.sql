@@ -9,6 +9,8 @@ USE FruityInc;
 CREATE USER java_app_user FOR LOGIN java_app_user;
 
 -- Grant EXECUTE permission on specific procedures
+
+-- Customer CRUD procedures
 GRANT EXECUTE ON uspAddCustomer 
 TO java_app_user;
 
@@ -24,6 +26,7 @@ TO java_app_user;
 GRANT EXECUTE ON uspDeleteCustomer
 TO java_app_user;
 
+-- FruitBasket CRUD procedures
 GRANT EXECUTE ON uspAddBasket
 TO java_app_user;
 
@@ -39,6 +42,7 @@ TO java_app_user;
 GRANT EXECUTE ON uspDeleteBasket
 TO java_app_user;
 
+-- Purchase CRUD procedures
 GRANT EXECUTE ON uspAddPurchase
 TO java_app_user;
 

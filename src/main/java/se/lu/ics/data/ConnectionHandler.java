@@ -14,7 +14,7 @@ import java.util.Properties;
  */
 public class ConnectionHandler {
     private String connectionURL;
-    private final String propertiedFilePath = "/config/se/lu/ics/config.properties";
+    private final String propertiedFilePath = "/se/lu/ics/config/config.properties";
 
     /**
      * Constructor that initializes the connection URL by loading properties from a file.
@@ -50,7 +50,7 @@ public class ConnectionHandler {
         connectionURL = "jdbc:sqlserver://"
                 + databaseServerName + ":"
                 + databaseServerPort + ";"
-                + "database=" + databaseName + ";"
+                + "databaseName=" + databaseName + ";"
                 + "user=" + databaseUserName + ";"
                 + "password=" + databaseUserPassword + ";"
                 + "encrypt=true;"
