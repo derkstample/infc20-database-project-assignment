@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import se.lu.ics.data.DaoException;
+import se.lu.ics.Main;
 import se.lu.ics.data.CustomerDao;
 import se.lu.ics.models.Customer;
 
@@ -47,12 +48,17 @@ public class CustomerViewController {
     private TextField textFieldCustomerDeliveryAddress;
 
     @FXML
-    private Button btnCustomerAdd;
+    private Button btnCustomerAddUpdate;
+
+    @FXML
+    private Button btnCustomerDelete;
 
     @FXML
     private Label labelErrorMessage;
 
     private CustomerDao customerDao;
+
+    private Main mainApp;
 
     /**
      * Constructor for CustomerController.
@@ -68,6 +74,39 @@ public class CustomerViewController {
     }
 
     /**
+     * Setter for Main mainApp, used for switching between views
+     * @param mainApp the Main application handling this CustomerViewController
+     */
+
+    public void setMainApp(Main mainApp){
+        this.mainApp = mainApp;
+    }
+
+    /**
+     * Handles the event when the "Fruit Basket Table" button is clicked. 
+     * It calls Main.loadFruitBasketView(), which changes the currently loaded scene to be controlled by FruitBasketViewController
+     *
+     * @param event MouseEvent triggered when the "Fruit Basket Table" button is clicked.
+     */
+
+     @FXML
+     private void buttonCustomerSwitchToFruitBasket_OnClick(MouseEvent e){
+         mainApp.loadFruitBasketView();
+     }
+
+     /**
+     * Handles the event when the "Purchase Table" button is clicked. 
+     * It calls Main.loadPurchaseView(), which changes the currently loaded scene to be controlled by PurchaseViewController
+     *
+     * @param event MouseEvent triggered when the "Purchase Table" button is clicked.
+     */
+
+     @FXML
+     private void buttonCustomerSwitchToPurchase_OnClick(MouseEvent e){
+         mainApp.loadPurchaseView();
+     }
+
+    /**
      * Initializes the TableView by setting up the columns and loading the initial 
      * list of customers from the database.
      */
@@ -78,22 +117,50 @@ public class CustomerViewController {
         tableColumnCustomerName.setCellValueFactory(new PropertyValueFactory<>("name"));
         tableColumnCustomerDeliveryAddress.setCellValueFactory(new PropertyValueFactory<>("deliveryAddress"));
 
+        // set up listener for tableView selection changes, thank you copilot
+        tableViewCustomer.getSelectionModel().selectedItemProperty().addListener((observable,oldValue,newValue) -> populateFields(newValue));
+
         // Load customer data from the database
         loadCustomers();
     }
 
     /**
-     * Handles the event when the "Add" button is clicked. 
-     * It reads the input from the text fields, creates a new Customer object,
-     * and saves it to the database using CustomerDao. If successful, it refreshes
-     * the TableView to display the newly added customer.
+     * Populates the TextFields of the CustomerView with the attributes of the
+     * currently selected customer in the TableView, or clears the fields if
+     * a customer is deselected
+     * 
+     * @param customer the customer whose attributes will populate the text fields
+     */
+    private void populateFields(Customer customer){
+        if(customer != null){
+            textFieldCustomerAccountNo.setText(customer.getAccountNo());
+            textFieldCustomerName.setText(customer.getName());
+            textFieldCustomerDeliveryAddress.setText(customer.getDeliveryAddress());
+            btnCustomerAddUpdate.setText("Update");
+        }else{
+            clearFields(); // surrounding with a try/catch didn't seem as appropriate here as just
+            // checking if customer is null, since it shouldn't be an error if it is
+        }
+    }
+
+    /**
+     * Handles the event when the "Add/Update" button is clicked. 
+     * Depending on if a preexisting customer is selected or not,
+     * it reads the input from the text fields, updates or creates a new Customer object,
+     * and updates or saves it to the database using CustomerDao. If successful, it refreshes
+     * the TableView to display the newly updated/added customer.
      *
-     * @param event MouseEvent triggered when the "Add" button is clicked.
+     * @param event MouseEvent triggered when the "Add/Update" button is clicked.
      */
     @FXML
-    private void buttonCustomerAdd_OnClick(MouseEvent event) {
+    private void buttonCustomerAddUpdate_OnClick(MouseEvent event) {
         clearErrorMessage();
 
+        if(btnCustomerAddUpdate.getText().equals("Add")) addCustomer();
+        else updateCustomer();
+    }
+
+    private void addCustomer(){
         try {
             // Retrieve input from text fields
             String customerAccountNo = textFieldCustomerAccountNo.getText();
@@ -110,11 +177,79 @@ public class CustomerViewController {
             loadCustomers();
 
             // Clear input fields after successful addition
-            textFieldCustomerAccountNo.clear();
-            textFieldCustomerName.clear(); 
-            textFieldCustomerDeliveryAddress.clear();
+            clearFields();
         } catch (DaoException e) {
             displayErrorMessage(e.getMessage());
+        }
+    }
+
+    private void updateCustomer(){
+        try{
+            // get selected customer from tableView
+            Customer selectedCustomer = tableViewCustomer.getSelectionModel().getSelectedItem();
+
+            String newAccountNo = textFieldCustomerAccountNo.getText();
+            String newName = textFieldCustomerName.getText();
+            String newDeliveryAddress = textFieldCustomerDeliveryAddress.getText();
+
+            if(selectedCustomer.getAccountNo().equals(newAccountNo)){ // we can only update if the account number is unchanged
+                // set the new name and delivery address for update
+                selectedCustomer.setName(newName);
+                selectedCustomer.setDeliveryAddress(newDeliveryAddress);
+
+                // use the Dao to update
+                customerDao.update(selectedCustomer);
+                
+                // Refresh the TableView to display the updated customer
+                loadCustomers();
+
+                // Clear input fields after successful update
+                clearFields();
+            }else{ // if user tries to change account number, display an error
+                displayErrorMessage("Cannot update customer account number!");
+            }
+        } catch(DaoException e){
+            displayErrorMessage(e.getMessage());
+        } catch(NullPointerException e){
+            displayErrorMessage("No customer selected!");
+        }
+    }
+
+    private void clearFields(){
+        textFieldCustomerAccountNo.clear();
+        textFieldCustomerName.clear();
+        textFieldCustomerDeliveryAddress.clear();
+        btnCustomerAddUpdate.setText("Add");
+        tableViewCustomer.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Handles the event when the "Delete" button is clicked. 
+     * It reads the accountNo of the currently highlighted
+     * customer on the table and deletes it using the CustomerDao. 
+     * If successful, it refreshes the TableView.
+     *
+     * @param event MouseEvent triggered when the "Delete" button is clicked.
+     */
+
+    @FXML
+    private void buttonCustomerDelete_OnClick(MouseEvent event){
+        clearErrorMessage();
+
+        try{
+            // get selected customer
+            Customer selectedCustomer = tableViewCustomer.getSelectionModel().getSelectedItem();
+            String accountNo = selectedCustomer.getAccountNo();
+
+            // use Dao to delete
+            customerDao.deleteByAccountNo(accountNo);
+
+            // Refresh the TableView
+            loadCustomers();
+        } catch(DaoException e){
+            displayErrorMessage(e.getMessage());
+        } catch(NullPointerException e){
+            displayErrorMessage("No customer selected to delete!");
         }
     }
 

@@ -88,7 +88,7 @@ public class CustomerDao {
         try (Connection connection = connectionHandler.getConnection();
                 CallableStatement statement = connection.prepareCall(callProcedure)) {
 
-            // Set student data into the prepared statement
+            // Set customer data into the prepared statement
             statement.setString(1, customer.getAccountNo());
             statement.setString(2, customer.getName());
             statement.setString(3, customer.getDeliveryAddress());
@@ -99,7 +99,7 @@ public class CustomerDao {
             if (e.getErrorCode() == 2627) { // Unique constraint violation
                 throw new DaoException("A customer with this AccountNo already exists.", e);
             } else {
-                throw new DaoException("Error saving customer: " + customer.getAccountNo(), e);
+                throw new DaoException("Error saving customer " + customer.getAccountNo() + ": " + e.getMessage(), e);
             }
         }
     }
@@ -137,7 +137,7 @@ public class CustomerDao {
      * @throws DaoException If there is an error deleting the customer.
      */
     public void deleteByAccountNo(String accountNo) {
-        String callProcedure = "{CALL uspDeleteStudent(?)}";
+        String callProcedure = "{CALL uspDeleteCustomer(?)}";
 
         try (Connection connection = connectionHandler.getConnection();
                 CallableStatement statement = connection.prepareCall(callProcedure)) {

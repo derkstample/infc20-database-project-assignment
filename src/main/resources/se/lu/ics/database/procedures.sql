@@ -217,6 +217,28 @@ BEGIN
 	END CATCH
 END;
 
+-- ================================================
+-- Author: [Derek Rodriguez]
+-- Create date: [2024-10-30]
+-- Description: Raise error and prevent insertion of Customers with bad AccountNo formatting
+-- ================================================
+
+CREATE OR ALTER TRIGGER CustomerAccountNoFormatTrigger
+ON Customer
+AFTER INSERT
+AS
+BEGIN
+	-- Check if any inserted row has bad formatting
+	IF EXISTS(
+		SELECT 1
+		FROM inserted
+		WHERE AccountNo NOT LIKE 'C[0-9][0-9][0-9]'
+	)
+	BEGIN
+		;THROW 50000, 'Customer AccountNo must be formatted as Cnnn, where n is a decimal digit', 1;
+		ROLLBACK  TRANSACTION
+	END
+END
 
 -- FruitBasket Stored Procedures --
 
@@ -437,6 +459,52 @@ BEGIN
 	END CATCH
 END;
 
+-- ================================================
+-- Author: [Derek Rodriguez]
+-- Create date: [2024-10-30]
+-- Description: Raise error and prevent insertion of FruitBaskets with bad BasketNo formatting
+-- ================================================
+
+CREATE OR ALTER TRIGGER FruitBasketBasketNoFormatTrigger
+ON FruitBasket
+AFTER INSERT
+AS
+BEGIN
+	-- Check if any inserted row has bad formatting
+	IF EXISTS(
+		SELECT 1
+		FROM inserted
+		WHERE BasketNo NOT LIKE 'B[0-9][0-9]'
+	)
+	BEGIN
+		;THROW 50000, 'FruitBasket BasketNo must be formatted as Bnn, where n is a decimal digit', 1;
+		ROLLBACK  TRANSACTION
+	END
+END
+
+-- ================================================
+-- Author: [Derek Rodriguez]
+-- Create date: [2024-10-30]
+-- Description: Raise error and prevent insertion of FruitBaskets with bad Price formatting
+-- ================================================
+
+CREATE OR ALTER TRIGGER FruitBasketPriceFormatTrigger
+ON FruitBasket
+AFTER INSERT
+AS
+BEGIN
+	-- Check if any inserted row has bad formatting
+	IF EXISTS(
+		SELECT 1
+		FROM inserted
+		WHERE Price NOT LIKE '[0-9]%.[0-9][0-9]' -- apparently % is used as + for regular expressions?
+	)
+	BEGIN
+		;THROW 50000, 'FruitBasket Price must be formatted as numbers with two decimal digits', 1;
+		ROLLBACK  TRANSACTION
+	END
+END
+
 -- Purchase Stored Procedures --
 
 -- ================================================
@@ -553,11 +621,8 @@ BEGIN
 		-- Select all records from the Purchase table
 		SELECT
 			Customer.AccountNo,
-			Customer.CustomerName,
-			Customer.DeliveryAddress,
 			FruitBasket.BasketNo,
-			FruitBasket.BasketName,
-			FruitBasket.Price
+			Purchase.PurchaseDate
 		FROM Customer
 		JOIN Purchase ON Customer.CustomerID = Purchase.CustomerID
 		JOIN FruitBasket ON Purchase.BasketID = FruitBasket.BasketID;

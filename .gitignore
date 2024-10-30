@@ -18,3 +18,4 @@ test/resources/projects/**/.vscode
 test/resources/projects/maven/salut/testGradle
 test-temp
 src/main/resources/se/lu/ics/config/config.properties
+target/

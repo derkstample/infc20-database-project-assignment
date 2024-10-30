@@ -7,11 +7,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-    prefHeight="586.0" prefWidth="739.0" xmlns="http://javafx.com/javafx/20.0.1"
+    prefHeight="586.0" prefWidth="839.0" xmlns="http://javafx.com/javafx/20.0.1"
     xmlns:fx="http://javafx.com/fxml/1" fx:controller="se.lu.ics.controllers.CustomerViewController">
     <children>
+        <!-- Title Label -->
+        <Label fx:id="labelTitle" layoutX="102.0" layoutY="70.0" text="Fruity Inc. Customers" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        
+        <!-- TableView for Customer -->
         <TableView fx:id="tableViewCustomer" layoutX="102.0" layoutY="101.0" prefHeight="200.0"
-            prefWidth="559.0">
+            prefWidth="618.0">
             <columns>
                 <TableColumn fx:id="tableColumnCustomerAccountNo" prefWidth="75.0" text="Account No" />
                 <TableColumn fx:id="tableColumnCustomerName" prefWidth="75.0" text="Name" />
@@ -21,15 +25,30 @@
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
+
+        <!-- TextFields for AccountNo, Name, and DeliveryAddress -->
         <TextField fx:id="textFieldCustomerAccountNo" layoutX="102.0" layoutY="324.0"
             promptText="Account No" />
         <TextField fx:id="textFieldCustomerName" layoutX="102.0" layoutY="367.0" promptText="Name" />
         <TextField fx:id="textFieldCustomerDeliveryAddress" layoutX="102.0" layoutY="410.0"
             promptText="Delivery Address" />
-        <Button fx:id="btnCustomerAdd" layoutX="102.0" layoutY="458.0" mnemonicParsing="false"
-            onMouseClicked="#buttonCustomerAdd_OnClick" text="Add" />
+
+        <!-- Add Button -->
+        <Button fx:id="btnCustomerAddUpdate" layoutX="102.0" layoutY="458.0" mnemonicParsing="false"
+            onMouseClicked="#buttonCustomerAddUpdate_OnClick" text="Add" />
+        
+        <!-- Delete button -->
+        <Button fx:id="btnCustomerDelete" layoutX="180.0" layoutY="458.0" mnemonicParsing="false"
+            onMouseClicked="#buttonCustomerDelete_OnClick" text="Delete" />
+
+        <!-- Switch to FruitBasket Button -->
+        <Button fx:id="btnCustomerSwitchToFruitBasket" layoutX="430.0" layoutY="458.0" mnemonicParsing="false"
+            onMouseClicked="#buttonCustomerSwitchToFruitBasket_OnClick" text="Fruit Basket Table" />
+
+        <!-- Switch to Purchase Button -->
+        <Button fx:id="btnCustomerSwitchToPurchase" layoutX="600.0" layoutY="458.0" mnemonicParsing="false"
+            onMouseClicked="#buttonCustomerSwitchToPurchase_OnClick" text="Purchase Table" />
         
         <Label fx:id="labelErrorMessage" layoutX="102.0" layoutY="500.0" text="" />
-        
     </children>
 </AnchorPane>
